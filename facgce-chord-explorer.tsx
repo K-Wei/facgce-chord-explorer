@@ -156,6 +156,18 @@ const CHORD_LIBRARY = {
   'Asus2': { frets: [0, 0, 2, 2, 0, 0], family: 'Sus', description: 'A suspended 2' },
   'Asus4': { frets: [0, 0, 0, 2, 5, 0], family: 'Sus', description: 'A sus4 with drone' },
   'Csus4': { frets: [5, 7, 0, 0, 5, 0], family: 'Sus', description: 'C sus4 — wants to resolve to C' },
+
+  // === Muted-string voicings (tighter, focused) ===
+  'C (tight)': { frets: [-1, -1, 0, 0, 0, 7], family: 'C', description: 'C major — muted bass, bright top' },
+  'Cmaj7 (tight)': { frets: [-1, -1, 0, 0, 0, 0], family: 'C', description: 'C-E open strings only — intimate' },
+  'Am (mid)': { frets: [-1, 0, 0, 2, 0, 0], family: 'Am', description: 'Am without low F — cleaner' },
+  'Am7 (mid)': { frets: [-1, 0, 0, 2, 3, 0], family: 'Am', description: 'Am7 without bass — airy' },
+  'Dm (tight)': { frets: [-1, -1, 2, 0, 3, 0], family: 'Dm', description: 'Dm upper strings — twinkling' },
+  'Em (tight)': { frets: [-1, -1, 0, 0, 0, 0], family: 'Em', description: 'G-C-E open — Em triad, no bass' },
+  'G (mid)': { frets: [-1, -1, 0, 0, 0, 0], family: 'G', description: 'G from upper open strings only' },
+  'G (top)': { frets: [-1, -1, -1, 0, 0, 0], family: 'G', description: 'G-C-E top three strings only' },
+  'F5': { frets: [0, -1, 0, -1, -1, -1], family: 'F', description: 'F power chord — F and C only' },
+  'Dm7 (mid)': { frets: [-1, -1, 2, 0, 0, 5], family: 'Dm', description: 'Dm7 top strings — delicate' },
 };
 
 // Common progressions in FACGCE (all in C major context)
@@ -209,8 +221,8 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Resolving, warm',
     chords: [
-      { nashville: 'ii', name: 'Dm7', frets: [3, 5, 2, 0, 3, 0] },
-      { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
+      { nashville: 'ii', name: 'Dm7', frets: [-1, -1, 2, 0, 3, 0] },
+      { nashville: 'V', name: 'G6', frets: [-1, -1, 0, 0, 0, 0] },
       { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
     ]
   },
@@ -219,9 +231,9 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Gentle descent',
     chords: [
-      { nashville: 'I', name: 'Cadd9', frets: [7, 9, 0, 2, 0, 0] },
-      { nashville: 'iii', name: 'Em7', frets: [0, 2, 0, 0, 3, 0] },
-      { nashville: 'vi', name: 'Am7', frets: [0, 0, 0, 2, 3, 0] },
+      { nashville: 'I', name: 'Cadd9', frets: [-1, -1, 0, 2, 0, 7] },
+      { nashville: 'iii', name: 'Em7', frets: [-1, 2, 0, 0, 3, 0] },
+      { nashville: 'vi', name: 'Am7', frets: [-1, 0, 0, 2, 3, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
     ]
   },
@@ -230,10 +242,10 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Restless, searching',
     chords: [
-      { nashville: 'vi', name: 'Am7', frets: [0, 0, 0, 2, 3, 0] },
-      { nashville: 'V', name: 'Gsus4', frets: [2, 4, 0, 0, 5, 0] },
+      { nashville: 'vi', name: 'Am7', frets: [-1, 0, 0, 2, 3, 0] },
+      { nashville: 'V', name: 'Gsus4', frets: [-1, -1, 0, 0, 5, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
-      { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
+      { nashville: 'V', name: 'G6', frets: [-1, -1, 0, 0, 0, 0] },
     ]
   },
   {
@@ -320,10 +332,10 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Descending melancholy',
     chords: [
-      { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
-      { nashville: 'iii', name: 'Em9', frets: [0, 2, 0, 0, 0, 2] },
-      { nashville: 'vi', name: 'Am9', frets: [0, 0, 0, 2, 3, 0] },
-      { nashville: 'ii', name: 'Dm9', frets: [3, 5, 2, 0, 3, 0] },
+      { nashville: 'I', name: 'Cmaj9', frets: [-1, -1, 0, 2, 0, 0] },
+      { nashville: 'iii', name: 'Em9', frets: [-1, 2, 0, 0, 0, 2] },
+      { nashville: 'vi', name: 'Am9', frets: [-1, 0, 0, 2, 3, 0] },
+      { nashville: 'ii', name: 'Dm9', frets: [-1, -1, 2, 0, 3, 0] },
     ]
   },
   {
@@ -353,10 +365,10 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Late night, reflective',
     chords: [
-      { nashville: 'vi', name: 'Am(add9)', frets: [0, 0, 2, 2, 0, 0] },
-      { nashville: 'iii', name: 'Em7', frets: [0, 2, 0, 0, 3, 0] },
+      { nashville: 'vi', name: 'Am(add9)', frets: [-1, 0, 2, 2, 0, 0] },
+      { nashville: 'iii', name: 'Em7', frets: [-1, 2, 0, 0, 3, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
-      { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
+      { nashville: 'I', name: 'Cmaj9', frets: [-1, -1, 0, 2, 0, 0] },
     ]
   },
   {
@@ -407,10 +419,10 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Descending, American Football',
     chords: [
-      { nashville: 'vi', name: 'Am9', frets: [0, 0, 0, 2, 3, 0] },
-      { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
+      { nashville: 'vi', name: 'Am9', frets: [-1, 0, 0, 2, 3, 0] },
+      { nashville: 'V', name: 'G6', frets: [-1, -1, 0, 0, 0, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
-      { nashville: 'iii', name: 'Em9', frets: [0, 2, 0, 0, 0, 2] },
+      { nashville: 'iii', name: 'Em9', frets: [-1, 2, 0, 0, 0, 2] },
     ]
   },
   {
@@ -423,6 +435,28 @@ const PROGRESSIONS = [
       { nashville: 'iii', name: 'Em7', frets: [0, 2, 0, 0, 3, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
       { nashville: 'V', name: 'Gadd9', frets: [2, 4, 0, 2, 0, 0] },
+    ]
+  },
+  {
+    name: 'I - vi - ii - V (tight)',
+    key: 'C',
+    mood: 'Quiet verse, intimate',
+    chords: [
+      { nashville: 'I', name: 'Cmaj7', frets: [-1, -1, 0, 0, 0, 0] },
+      { nashville: 'vi', name: 'Am7', frets: [-1, 0, 0, 2, 3, 0] },
+      { nashville: 'ii', name: 'Dm7', frets: [-1, -1, 2, 0, 0, 5] },
+      { nashville: 'V', name: 'G', frets: [-1, -1, -1, 0, 0, 0] },
+    ]
+  },
+  {
+    name: 'IV - vi - iii - I (sparse)',
+    key: 'C',
+    mood: 'Sparse, breathing room',
+    chords: [
+      { nashville: 'IV', name: 'F', frets: [0, -1, 0, -1, 0, 0] },
+      { nashville: 'vi', name: 'Am', frets: [-1, 0, 0, 2, -1, 0] },
+      { nashville: 'iii', name: 'Em', frets: [-1, -1, 0, 0, 0, 0] },
+      { nashville: 'I', name: 'C', frets: [-1, -1, 0, 0, 0, 7] },
     ]
   },
 ];
