@@ -34,4 +34,4 @@ Everything lives in `facgce-chord-explorer.tsx` (~630 lines):
 - Commit after each logical feature or fix, not after every file change
 - Each commit should be a coherent, reviewable unit
 - Use descriptive commit messages that explain the "why" behind changes
-- Do not auto-commit or use hooks for committing — commit deliberately at checkpoints
+- Commit automatically after completing each logical feature — don't wait for the user to ask
