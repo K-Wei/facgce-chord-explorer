@@ -28,3 +28,10 @@ Everything lives in `facgce-chord-explorer.tsx` (~630 lines):
 - Fret value `-1` means muted/not played; `0` means open string
 - Chord identification uses a candidate-scoring approach, not exact lookup
 - Progressions reference chords by Nashville numbers (I, ii, iii, IV, V, vi, vii°) and include pre-baked fret shapes for each chord in the progression
+
+## Git Workflow
+
+- Commit after each logical feature or fix, not after every file change
+- Each commit should be a coherent, reviewable unit
+- Use descriptive commit messages that explain the "why" behind changes
+- Do not auto-commit or use hooks for committing — commit deliberately at checkpoints
