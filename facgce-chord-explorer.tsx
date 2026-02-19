@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Music, RefreshCw, Lightbulb, Sun, Moon, HelpCircle, X, MessageCircle } from 'lucide-react';
-import Anthropic from '@anthropic-ai/sdk';
-
 function TuningForkIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -20,10 +18,6 @@ function TuningForkIcon({ className = "w-5 h-5" }: { className?: string }) {
     </svg>
   );
 }
-
-const anthropic = import.meta.env.VITE_ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY as string, dangerouslyAllowBrowser: true })
-  : null;
 
 const TUNING = ['F', 'A', 'C', 'G', 'C', 'E'];
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -960,7 +954,7 @@ export default function ChordExplorer() {
   }, [chatMessages]);
 
   const sendMessage = async () => {
-    if (!chatInput.trim() || chatLoading || !anthropic) return;
+    if (!chatInput.trim() || chatLoading) return;
     const userMessage = chatInput.trim();
     setChatInput('');
     setChatLoading(true);
@@ -991,14 +985,20 @@ CURRENT PROGRESSION:
 ${progressionText}
 
 Keep answers concise (2–5 sentences). Focus on practical music theory.`;
-      const response = await anthropic.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 600,
-        system: systemPrompt,
-        messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+          systemPrompt,
+        }),
       });
-      const assistantContent = response.content[0].type === 'text' ? response.content[0].text : '';
-      setChatMessages(prev => [...prev, { role: 'assistant', content: assistantContent }]);
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || `Server error (${res.status})`);
+      }
+      const data = await res.json();
+      setChatMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to get response';
       setChatMessages(prev => [...prev, { role: 'assistant', content: `Error: ${msg}` }]);
@@ -1283,69 +1283,60 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
                   </button>
                 </div>
               </div>
-              {anthropic === null ? (
-                <div className={`text-center p-4 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                  Add <code className={`font-mono px-1 rounded ${darkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>VITE_ANTHROPIC_API_KEY</code> to{' '}
-                  <code className={`font-mono px-1 rounded ${darkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>.env.local</code>
-                </div>
-              ) : (
-                <>
-                  {/* Message history */}
-                  <div className={`overflow-y-auto p-3 h-[420px] ${darkMode ? 'bg-neutral-800/50' : 'bg-gray-50'}`}>
-                    {chatMessages.length === 0 ? (
-                      <div className={`text-center text-xs mt-8 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
-                        Ask anything about music theory, chord voicings, or your current progression
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {chatMessages.map((msg, i) => (
-                          <div key={i} className={`text-xs ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                            <span className={`inline-block px-2.5 py-1.5 rounded-lg max-w-[90%] text-left whitespace-pre-wrap ${
-                              msg.role === 'user'
-                                ? darkMode ? 'bg-amber-900 text-amber-100' : 'bg-amber-100 text-amber-900'
-                                : darkMode ? 'bg-neutral-700 text-gray-200' : 'bg-white border border-gray-200 text-gray-800'
-                            }`}>
-                              {msg.content}
-                            </span>
-                          </div>
-                        ))}
-                        <div ref={chatEndRef} />
-                      </div>
-                    )}
+              {/* Message history */}
+              <div className={`overflow-y-auto p-3 h-[420px] ${darkMode ? 'bg-neutral-800/50' : 'bg-gray-50'}`}>
+                {chatMessages.length === 0 ? (
+                  <div className={`text-center text-xs mt-8 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                    Ask anything about music theory, chord voicings, or your current progression
                   </div>
-                  {/* Suggested prompt chips */}
-                  <div className="flex flex-wrap gap-1.5 px-3 pt-3">
-                    {['Explain this chord', 'What scale fits?', 'Why does this progression work?'].map((prompt) => (
-                      <button
-                        key={prompt}
-                        onClick={() => setChatInput(prompt)}
-                        className={`px-2.5 py-1 rounded-full text-xs transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200'}`}
-                      >
-                        {prompt}
-                      </button>
+                ) : (
+                  <div className="space-y-3">
+                    {chatMessages.map((msg, i) => (
+                      <div key={i} className={`text-xs ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                        <span className={`inline-block px-2.5 py-1.5 rounded-lg max-w-[90%] text-left whitespace-pre-wrap ${
+                          msg.role === 'user'
+                            ? darkMode ? 'bg-amber-900 text-amber-100' : 'bg-amber-100 text-amber-900'
+                            : darkMode ? 'bg-neutral-700 text-gray-200' : 'bg-white border border-gray-200 text-gray-800'
+                        }`}>
+                          {msg.content}
+                        </span>
+                      </div>
                     ))}
+                    <div ref={chatEndRef} />
                   </div>
-                  {/* Input row */}
-                  <div className="flex gap-2 p-3">
-                    <input
-                      type="text"
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(); } }}
-                      placeholder="Ask about music theory..."
-                      disabled={chatLoading}
-                      className={`flex-1 px-3 py-2 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 ${darkMode ? 'bg-neutral-800 border border-neutral-700 text-white placeholder-gray-600' : 'bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400'}`}
-                    />
-                    <button
-                      onClick={() => { void sendMessage(); }}
-                      disabled={chatLoading || !chatInput.trim()}
-                      className="px-3 py-2 bg-emerald-700 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs transition-colors flex items-center"
-                    >
-                      {chatLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : '▶'}
-                    </button>
-                  </div>
-                </>
-              )}
+                )}
+              </div>
+              {/* Suggested prompt chips */}
+              <div className="flex flex-wrap gap-1.5 px-3 pt-3">
+                {['Explain this chord', 'What scale fits?', 'Why does this progression work?'].map((prompt) => (
+                  <button
+                    key={prompt}
+                    onClick={() => setChatInput(prompt)}
+                    className={`px-2.5 py-1 rounded-full text-xs transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200'}`}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+              {/* Input row */}
+              <div className="flex gap-2 p-3">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(); } }}
+                  placeholder="Ask about music theory..."
+                  disabled={chatLoading}
+                  className={`flex-1 px-3 py-2 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 ${darkMode ? 'bg-neutral-800 border border-neutral-700 text-white placeholder-gray-600' : 'bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400'}`}
+                />
+                <button
+                  onClick={() => { void sendMessage(); }}
+                  disabled={chatLoading || !chatInput.trim()}
+                  className="px-3 py-2 bg-emerald-700 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs transition-colors flex items-center"
+                >
+                  {chatLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : '▶'}
+                </button>
+              </div>
             </div>
           )}
         </div>
