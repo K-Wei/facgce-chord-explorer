@@ -975,15 +975,6 @@ export default function ChordExplorer() {
       const progressionText = currentProgression
         ? `Name: ${currentProgression.name}\nChords: ${currentProgression.chords.map((c: {name: string}) => c.name).join(' → ')}`
         : 'No progression selected';
-      const chordFamilies = [...new Set(Object.values(CHORD_LIBRARY).map((c) => c.family))];
-      const chordCatalog = chordFamilies.map(family => {
-        const names = Object.entries(CHORD_LIBRARY)
-          .filter(([, v]) => v.family === family)
-          .map(([k]) => k)
-          .join(', ');
-        return `${family} family: ${names}`;
-      }).join('\n');
-      const progressionNames = PROGRESSIONS.map(p => p.name).join('\n');
       const systemPrompt = `You are a music theory assistant in a guitar chord explorer app.
 Tuning: FACGCE open tuning (F-A-C-G-C-E, low to high).
 
@@ -997,12 +988,6 @@ ${extensionText}
 
 CURRENT PROGRESSION:
 ${progressionText}
-
-CHORD LIBRARY (names by family):
-${chordCatalog}
-
-ALL PROGRESSIONS AVAILABLE:
-${progressionNames}
 
 Keep answers concise (2–5 sentences). Focus on practical music theory.`;
       const response = await anthropic.messages.create({
