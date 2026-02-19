@@ -4,30 +4,64 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A single-file React component (`facgce-chord-explorer.tsx`) that provides an interactive chord explorer for guitars in **FACGCE open tuning** (F-A-C-G-C-E). No build system, package.json, or project configuration exists — this is a standalone component meant to be embedded in a React project.
+An interactive chord explorer and progression generator for guitars in **FACGCE open tuning** (F-A-C-G-C-E). Built with React 19 + TypeScript + Tailwind CSS v4 + Vite 7. The core logic lives in a single file (`facgce-chord-explorer.tsx`, ~1270 lines) which is imported by `src/main.tsx` as the app root.
 
-## Dependencies (via imports)
+## Commands
 
-- `react` (useState)
-- `lucide-react` (Music, RefreshCw, Lightbulb icons)
-- Tailwind CSS (utility classes in JSX)
+- `npm run dev` — Start Vite dev server (localhost:5173)
+- `npm run build` — Type-check (`tsc -b`) + production build
+- `npm run lint` — ESLint
+- `npm run preview` — Preview production build
+
+## Dependencies
+
+- `react` / `react-dom` (v19)
+- `lucide-react` (Music, RefreshCw, Lightbulb, Sun, Moon, HelpCircle, X icons)
+- `tailwindcss` v4 (via `@tailwindcss/vite` plugin, imported in `src/index.css`)
+- Vite 7, TypeScript ~5.9
 
 ## Architecture
 
-Everything lives in `facgce-chord-explorer.tsx` (~630 lines):
+### File Layout
 
-- **Constants** (top of file): `TUNING`, `NOTES` (chromatic scale), `CHORD_LIBRARY` (17 preset shapes with fret arrays), `PROGRESSIONS` (13 progressions using Nashville Number System in key of C)
-- **`getNoteFromString(stringNum, fret)`**: Maps string index + fret to a note name using TUNING offsets into NOTES array
-- **`identifyChord(selectedFrets)`**: Scoring algorithm that tries every note as a potential root, computes intervals, identifies chord type, and picks the best match. Scoring favors C-major-scale roots, common FACGCE roots (F/C/G/Am/Dm), simpler chord types, complete triads, and root-position voicings
-- **`identifyChordType(intervals)`**: Pattern-matches interval sets to 30+ chord types (triads, 7ths, sus, dim, aug, extensions, power chords, quartal)
-- **`ChordExplorer` (default export)**: Main React component with two state values (`selectedFrets`, `currentProgression`). Renders a two-column layout: chord input/analysis on the left, progression suggestions on the right
+```
+facgce-chord-explorer.tsx   # All component logic, constants, and helpers
+src/main.tsx                # React entry point — imports ChordExplorer as App
+src/index.css               # @import "tailwindcss"
+index.html                  # Vite HTML entry
+```
+
+### facgce-chord-explorer.tsx Structure
+
+**Constants (top of file):**
+- `TUNING` — `['F', 'A', 'C', 'G', 'C', 'E']`
+- `NOTES` — chromatic scale starting from C
+- `STRING_FREQUENCIES` — Hz values for each open string (F2 through E4)
+- `CHORD_LIBRARY` — ~40 preset chord shapes grouped by family (F, C, Am, Dm, G, Em, Bb, Moveable, High, Sus, muted-string voicings)
+- `PROGRESSIONS` — 24 progressions using Nashville Number System in key of C, with mood/vibe tags
+
+**Helper Functions:**
+- `TuningForkIcon` — Custom SVG icon component
+- `playNote(frequency)` — Karplus-Strong physical modeling synthesis with guitar body resonance (Web Audio API). Includes pick-position filtering, frequency-dependent damping, two-stage low-pass filtering, and body resonance EQ
+- `getNoteFromString(stringNum, fret)` — Maps string index + fret to a note name via TUNING offsets into NOTES
+- `identifyChord(selectedFrets)` — Candidate-scoring algorithm: tries every unique note as a potential root, computes intervals, identifies chord type, scores by C-major-scale membership, common FACGCE roots, chord simplicity, triad completeness, and root-position preference
+- `identifyChordType(intervals)` — Pattern-matches interval sets to 30+ chord types (triads, 7ths, sus, dim, aug, extensions, power chords, quartal, partial voicings)
+- `voiceLeadingScore(fromFrets, toFrets)` — Scores transition smoothness between two shapes (common tones +10, open drone bonus +5, small movements +4/+2, penalizes big jumps)
+- `getVoiceLeadingHints(fromFrets, toFrets)` — Returns human-readable transition hints ("X strings stay, Y strings move")
+- `getExtensionSuggestions(selectedFrets, chordName)` — Finds musically useful extensions (add9, sus2, sus4, maj7, min7, 6, add11) reachable with 1-2 finger changes on any string
+
+**Main Component — `ChordExplorer` (default export):**
+- State: `selectedFrets`, `currentProgression`, `darkMode`, `showHelp`, `showTuner`
+- Two-column layout: chord input/analysis (left), progression suggestions (right)
+- Progression generation: filters by Nashville number match, ranks by voice-leading score, rotates to start from user's chord, replaces matched chord with user's exact fingering
 
 ## Key Domain Details
 
 - All fret arrays are 6 elements ordered low-to-high: `[F, A, C, G, C, E]`
-- Fret value `-1` means muted/not played; `0` means open string
-- Chord identification uses a candidate-scoring approach, not exact lookup
-- Progressions reference chords by Nashville numbers (I, ii, iii, IV, V, vi, vii°) and include pre-baked fret shapes for each chord in the progression
+- Fret value `-1` means muted/not played; `0` means open string; `1-24` means fretted
+- Chord identification uses candidate-scoring, not exact lookup
+- Progressions reference chords by Nashville numbers (I, ii, iii, IV, V, vi, vii°, bVII, iv) and include pre-baked fret shapes
+- Voice-leading scoring prioritizes: common tones > open-string drones > small fret movements
 
 ## Git Workflow
 
