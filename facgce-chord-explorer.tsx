@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Music, RefreshCw, Lightbulb, Sun, Moon, HelpCircle, X, MessageCircle } from 'lucide-react';
 function TuningForkIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
@@ -115,7 +115,7 @@ function playNote(frequency: number) {
 
 // Actual chord shapes that work well in FACGCE tuning
 // Grouped by family for discoverability
-const CHORD_LIBRARY = {
+export const CHORD_LIBRARY = {
   // === F family (open string home base) ===
   'Fmaj9': { frets: [0, 0, 0, 0, 0, 0], family: 'F', description: 'Open strings — the natural voicing' },
   'Fmaj7': { frets: [0, 0, 0, 0, 0, 0], family: 'F', description: 'Same as Fmaj9, emphasize different notes' },
@@ -469,16 +469,16 @@ const PROGRESSIONS = [
   },
 ];
 
-function getNoteFromString(stringNum, fret) {
+function getNoteFromString(stringNum: number, fret: number) {
   const openNote = TUNING[stringNum];
   const openNoteIndex = NOTES.indexOf(openNote);
   return NOTES[(openNoteIndex + fret) % 12];
 }
 
-function identifyChord(selectedFrets) {
+function identifyChord(selectedFrets: number[]) {
   const notes = selectedFrets
-    .map((fret, string) => fret >= 0 ? getNoteFromString(string, fret) : null)
-    .filter(note => note !== null);
+    .map((fret: number, string: number) => fret >= 0 ? getNoteFromString(string, fret) : null)
+    .filter((note: string | null) => note !== null);
   
   if (notes.length === 0) return 'No notes selected';
   
@@ -491,13 +491,13 @@ function identifyChord(selectedFrets) {
   }
   
   // Convert notes to semitone values for interval calculation (C = 0)
-  const noteToSemitone = (note) => NOTES.indexOf(note);
+  const noteToSemitone = (note: string) => NOTES.indexOf(note);
   const semitones = uniqueNotes.map(noteToSemitone);
   
   // Find the bass note (lowest note actually played, not just in the set)
   const playedNotes = selectedFrets
-    .map((fret, string) => fret >= 0 ? getNoteFromString(string, fret) : null);
-  const bassNote = playedNotes.find(n => n !== null);
+    .map((fret: number, string: number) => fret >= 0 ? getNoteFromString(string, fret) : null);
+  const bassNote = playedNotes.find((n: string | null) => n !== null);
   
   // Try each note as potential root
   const chordCandidates = [];
@@ -574,16 +574,15 @@ function identifyChord(selectedFrets) {
   return `Custom (${uniqueNotes.join(', ')})`;
 }
 
-function identifyChordType(intervals) {
+function identifyChordType(intervals: number[]) {
   // intervals is an array of semitone distances from root, e.g., [0, 2, 4, 7, 9]
   const set = new Set(intervals);
-  
+
   // Must include root (0)
   if (!set.has(0)) return null;
-  
+
   // Helper to check if all required intervals are present
-  const hasAll = (...required) => required.every(i => set.has(i));
-  const hasAny = (...options) => options.some(i => set.has(i));
+  const hasAll = (...required: number[]) => required.every(i => set.has(i));
   
   // TRIADS (most common)
   const hasThird = set.has(3) || set.has(4);
@@ -833,7 +832,7 @@ export default function ChordExplorer() {
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const handleFretChange = (stringIndex, value) => {
+  const handleFretChange = (stringIndex: number, value: string) => {
     const newFrets = [...selectedFrets];
     const normalized = value.toLowerCase().trim();
     
@@ -866,8 +865,6 @@ export default function ChordExplorer() {
     
     // Get the current chord name and extract details
     const currentChordName = identifyChord(selectedFrets);
-    const currentRoot = currentChordName.split('/')[0].replace(/[^A-G#b]/g, '');
-    
     // Find which Nashville number this chord would be in C major
     const rootToNashville = {
       'C': 'I',
@@ -1007,7 +1004,7 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
     }
   };
 
-  const loadChordShape = (frets) => {
+  const loadChordShape = (frets: number[]) => {
     setSelectedFrets([...frets]);
   };
 
@@ -1196,7 +1193,7 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
                 </div>
 
                 <div className="space-y-3">
-                  {currentProgression.chords.map((chord, idx) => (
+                  {currentProgression.chords.map((chord: any, idx: number) => (
                     <div key={idx} className={`p-4 rounded-lg transition-colors ${
                       chord.isUserChord
                         ? darkMode ? 'bg-amber-950 border border-amber-700' : 'bg-amber-50 border-2 border-amber-400'
@@ -1222,7 +1219,7 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
                         </button>
                       </div>
                       <div className="flex gap-1 mb-2">
-                        {chord.frets.map((fret, string) => (
+                        {chord.frets.map((fret: number, string: number) => (
                           <div
                             key={string}
                             className={`w-8 h-8 flex items-center justify-center rounded text-xs font-mono ${
@@ -1238,9 +1235,9 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
                         ))}
                       </div>
                       <div className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                        {chord.frets.map((fret, string) =>
+                        {chord.frets.map((fret: number, string: number) =>
                           fret >= 0 ? getNoteFromString(string, fret) : null
-                        ).filter(n => n).join(' - ')}
+                        ).filter((n: string | null) => n).join(' - ')}
                       </div>
                       {chord.voiceLeadingHints && chord.voiceLeadingHints.length > 0 && (
                         <div className={`text-xs mt-1 italic ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
