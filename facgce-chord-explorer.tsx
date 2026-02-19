@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Music, RefreshCw, Lightbulb, Sun, Moon, HelpCircle, X } from 'lucide-react';
+import Anthropic from '@anthropic-ai/sdk';
 
 function TuningForkIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
@@ -19,6 +20,10 @@ function TuningForkIcon({ className = "w-5 h-5" }: { className?: string }) {
     </svg>
   );
 }
+
+const anthropic = import.meta.env.VITE_ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY as string, dangerouslyAllowBrowser: true })
+  : null;
 
 const TUNING = ['F', 'A', 'C', 'G', 'C', 'E'];
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -203,7 +208,6 @@ const PROGRESSIONS = [
   {
     name: 'I - V - vi - IV',
     key: 'C',
-    mood: 'Classic pop feel',
     chords: [
       { nashville: 'I', name: 'Cadd9', frets: [7, 9, 0, 2, 0, 0] },
       { nashville: 'V', name: 'Gadd11', frets: [2, 4, 0, 0, 5, 0] },
@@ -214,7 +218,6 @@ const PROGRESSIONS = [
   {
     name: 'I - IV - V',
     key: 'C',
-    mood: 'Simple, bright',
     chords: [
       { nashville: 'I', name: 'Cmaj7', frets: [5, 7, 0, 0, 0, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
@@ -224,7 +227,6 @@ const PROGRESSIONS = [
   {
     name: 'vi - IV - I - V',
     key: 'C',
-    mood: 'Emotional, driving',
     chords: [
       { nashville: 'vi', name: 'Am11', frets: [0, 0, 0, 2, 5, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
@@ -235,7 +237,6 @@ const PROGRESSIONS = [
   {
     name: 'I - vi - ii - V',
     key: 'C',
-    mood: 'Jazz-influenced turnaround',
     chords: [
       { nashville: 'I', name: 'Cmaj7', frets: [5, 7, 0, 0, 0, 0] },
       { nashville: 'vi', name: 'Am7', frets: [0, 0, 0, 2, 3, 0] },
@@ -246,7 +247,6 @@ const PROGRESSIONS = [
   {
     name: 'ii - V - I',
     key: 'C',
-    mood: 'Resolving, warm',
     chords: [
       { nashville: 'ii', name: 'Dm7', frets: [3, 5, 2, 0, 3, 0] },
       { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
@@ -256,7 +256,6 @@ const PROGRESSIONS = [
   {
     name: 'I - iii - vi - IV',
     key: 'C',
-    mood: 'Gentle descent',
     chords: [
       { nashville: 'I', name: 'Cadd9', frets: [7, 9, 0, 2, 0, 0] },
       { nashville: 'iii', name: 'Em7', frets: [0, 2, 0, 0, 3, 0] },
@@ -267,7 +266,6 @@ const PROGRESSIONS = [
   {
     name: 'vi - V - IV - V',
     key: 'C',
-    mood: 'Restless, searching',
     chords: [
       { nashville: 'vi', name: 'Am7', frets: [0, 0, 0, 2, 3, 0] },
       { nashville: 'V', name: 'Gsus4', frets: [2, 4, 0, 0, 5, 0] },
@@ -278,7 +276,6 @@ const PROGRESSIONS = [
   {
     name: 'I - iii - IV - V',
     key: 'C',
-    mood: 'Uplifting, building',
     chords: [
       { nashville: 'I', name: 'Cmaj7', frets: [5, 7, 0, 0, 0, 0] },
       { nashville: 'iii', name: 'Em11', frets: [0, 2, 0, 0, 5, 0] },
@@ -289,7 +286,6 @@ const PROGRESSIONS = [
   {
     name: 'IV - V - iii - vi (Royal Road)',
     key: 'C',
-    mood: 'Dramatic, anime-esque',
     chords: [
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
       { nashville: 'V', name: 'Gsus4', frets: [2, 4, 0, 0, 5, 0] },
@@ -300,7 +296,6 @@ const PROGRESSIONS = [
   {
     name: 'vi - ii - V - I',
     key: 'C',
-    mood: 'Full circle resolution',
     chords: [
       { nashville: 'vi', name: 'Am7', frets: [0, 0, 0, 2, 3, 0] },
       { nashville: 'ii', name: 'Dm9', frets: [3, 5, 2, 0, 3, 0] },
@@ -311,7 +306,6 @@ const PROGRESSIONS = [
   {
     name: 'I - ii - iii - IV',
     key: 'C',
-    mood: 'Stepwise, contemplative',
     chords: [
       { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
       { nashville: 'ii', name: 'Dm7', frets: [3, 5, 2, 0, 3, 0] },
@@ -322,7 +316,6 @@ const PROGRESSIONS = [
   {
     name: 'I - V - vi - iii - IV',
     key: 'C',
-    mood: 'Anthemic',
     chords: [
       { nashville: 'I', name: 'Cadd9', frets: [7, 9, 0, 2, 0, 0] },
       { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
@@ -335,7 +328,6 @@ const PROGRESSIONS = [
   {
     name: 'IV - ii - IV - I',
     key: 'C',
-    mood: 'Wistful, yearning',
     chords: [
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
       { nashville: 'ii', name: 'Dm9', frets: [3, 5, 2, 0, 3, 0] },
@@ -346,7 +338,6 @@ const PROGRESSIONS = [
   {
     name: 'vi - IV - I - V',
     key: 'C',
-    mood: 'Nostalgic drive',
     chords: [
       { nashville: 'vi', name: 'Am9', frets: [0, 0, 0, 2, 3, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
@@ -357,7 +348,6 @@ const PROGRESSIONS = [
   {
     name: 'I - iii - vi - ii',
     key: 'C',
-    mood: 'Descending melancholy',
     chords: [
       { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
       { nashville: 'iii', name: 'Em9', frets: [0, 2, 0, 0, 0, 2] },
@@ -368,7 +358,6 @@ const PROGRESSIONS = [
   {
     name: 'IV - Vsus4 - V - I',
     key: 'C',
-    mood: 'Tension & release',
     chords: [
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
       { nashville: 'V', name: 'Gsus4', frets: [2, 4, 0, 0, 5, 0] },
@@ -379,7 +368,6 @@ const PROGRESSIONS = [
   {
     name: 'I - IV - vi - IV',
     key: 'C',
-    mood: 'Circular, hypnotic',
     chords: [
       { nashville: 'I', name: 'Cadd9', frets: [7, 9, 0, 2, 0, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
@@ -390,7 +378,6 @@ const PROGRESSIONS = [
   {
     name: 'vi - iii - IV - I',
     key: 'C',
-    mood: 'Late night, reflective',
     chords: [
       { nashville: 'vi', name: 'Am(add9)', frets: [0, 0, 2, 2, 0, 0] },
       { nashville: 'iii', name: 'Em7', frets: [0, 2, 0, 0, 3, 0] },
@@ -401,7 +388,6 @@ const PROGRESSIONS = [
   {
     name: 'I - bVII - IV - I',
     key: 'C',
-    mood: 'Modal interchange — borrowed Bb',
     chords: [
       { nashville: 'I', name: 'Cmaj7', frets: [5, 7, 0, 0, 0, 0] },
       { nashville: 'bVII', name: 'Bbmaj7', frets: [0, 3, 0, 3, 3, 5] },
@@ -412,7 +398,6 @@ const PROGRESSIONS = [
   {
     name: 'IV - bVII - I',
     key: 'C',
-    mood: 'Triumphant, modal',
     chords: [
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
       { nashville: 'bVII', name: 'Bb', frets: [0, 3, 0, 3, 3, 0] },
@@ -422,7 +407,6 @@ const PROGRESSIONS = [
   {
     name: 'ii - iii - IV - V',
     key: 'C',
-    mood: 'Ascending, building',
     chords: [
       { nashville: 'ii', name: 'Dm9', frets: [3, 5, 2, 0, 3, 0] },
       { nashville: 'iii', name: 'Em9', frets: [0, 2, 0, 0, 0, 2] },
@@ -433,7 +417,6 @@ const PROGRESSIONS = [
   {
     name: 'I - Isus4 - IV - iv',
     key: 'C',
-    mood: 'Bittersweet resolve',
     chords: [
       { nashville: 'I', name: 'Cmaj7', frets: [5, 7, 0, 0, 0, 0] },
       { nashville: 'I', name: 'Csus4', frets: [5, 7, 0, 0, 5, 0] },
@@ -444,7 +427,6 @@ const PROGRESSIONS = [
   {
     name: 'vi - V - IV - iii',
     key: 'C',
-    mood: 'Descending, American Football',
     chords: [
       { nashville: 'vi', name: 'Am9', frets: [0, 0, 0, 2, 3, 0] },
       { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
@@ -455,7 +437,6 @@ const PROGRESSIONS = [
   {
     name: 'I - vi - iii - IV - V',
     key: 'C',
-    mood: 'Epic build, post-rock',
     chords: [
       { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
       { nashville: 'vi', name: 'Am(add9)', frets: [0, 0, 2, 2, 0, 0] },
@@ -467,7 +448,6 @@ const PROGRESSIONS = [
   {
     name: 'I - vi - ii - V (tight)',
     key: 'C',
-    mood: 'Quiet verse, intimate',
     chords: [
       // C(0), G(0), C(0), E(0) → C major
       { nashville: 'I', name: 'C', frets: [-1, -1, 0, 0, 0, 0] },
@@ -482,7 +462,6 @@ const PROGRESSIONS = [
   {
     name: 'IV - vi - I - vi (sparse)',
     key: 'C',
-    mood: 'Sparse, breathing room',
     chords: [
       // F(0), A(0), C(0), C(0), E(0) → F with open strings
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, -1, 0, 0] },
@@ -854,6 +833,10 @@ export default function ChordExplorer() {
   const [darkMode, setDarkMode] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
   const [showTuner, setShowTuner] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{role:'user'|'assistant', content:string}[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const handleFretChange = (stringIndex, value) => {
     const newFrets = [...selectedFrets];
@@ -969,6 +952,73 @@ export default function ChordExplorer() {
     };
 
     setCurrentProgression(modifiedProgression);
+  };
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
+  const sendMessage = async () => {
+    if (!chatInput.trim() || chatLoading || !anthropic) return;
+    const userMessage = chatInput.trim();
+    setChatInput('');
+    setChatLoading(true);
+    const updatedMessages = [...chatMessages, { role: 'user' as const, content: userMessage }];
+    setChatMessages(updatedMessages);
+    try {
+      const playedNotes = selectedFrets
+        .map((f, i) => f >= 0 ? getNoteFromString(i, f) : null)
+        .filter(Boolean);
+      const extensionText = extensionSuggestions
+        .map(s => `- ${s.description} → ${s.resultName}`)
+        .join('\n') || 'None';
+      const progressionText = currentProgression
+        ? `Name: ${currentProgression.name}\nChords: ${currentProgression.chords.map((c: {name: string}) => c.name).join(' → ')}`
+        : 'No progression selected';
+      const chordFamilies = [...new Set(Object.values(CHORD_LIBRARY).map((c) => c.family))];
+      const chordCatalog = chordFamilies.map(family => {
+        const names = Object.entries(CHORD_LIBRARY)
+          .filter(([, v]) => v.family === family)
+          .map(([k]) => k)
+          .join(', ');
+        return `${family} family: ${names}`;
+      }).join('\n');
+      const progressionNames = PROGRESSIONS.map(p => p.name).join('\n');
+      const systemPrompt = `You are a music theory assistant in a guitar chord explorer app.
+Tuning: FACGCE open tuning (F-A-C-G-C-E, low to high).
+
+CURRENT CHORD:
+- Frets: [${selectedFrets.join(', ')}] (-1 = muted)
+- Name: ${chordName}
+- Notes: ${playedNotes.join(', ') || 'None'}
+
+EXTENSION SUGGESTIONS:
+${extensionText}
+
+CURRENT PROGRESSION:
+${progressionText}
+
+CHORD LIBRARY (names by family):
+${chordCatalog}
+
+ALL PROGRESSIONS AVAILABLE:
+${progressionNames}
+
+Keep answers concise (2–5 sentences). Focus on practical music theory.`;
+      const response = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
+        system: systemPrompt,
+        messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+      });
+      const assistantContent = response.content[0].type === 'text' ? response.content[0].text : '';
+      setChatMessages(prev => [...prev, { role: 'assistant', content: assistantContent }]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to get response';
+      setChatMessages(prev => [...prev, { role: 'assistant', content: `Error: ${msg}` }]);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   const loadChordShape = (frets) => {
@@ -1149,9 +1199,6 @@ export default function ChordExplorer() {
                 <div className={`p-3 rounded-lg ${darkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
                   <div className="font-semibold text-lg">{currentProgression.name}</div>
                   <div className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Key of {currentProgression.key}</div>
-                  {currentProgression.mood && (
-                    <div className={`text-xs mt-1 italic ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>{currentProgression.mood}</div>
-                  )}
                 </div>
 
                 <div className="space-y-3">
@@ -1220,6 +1267,83 @@ export default function ChordExplorer() {
           </div>
         </div>
 
+        {/* Music Theory Copilot */}
+        <div className={`mt-6 rounded-xl p-6 ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-lg'}`}>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Music Theory Copilot</h2>
+            {chatMessages.length > 0 && (
+              <button
+                onClick={() => setChatMessages([])}
+                className={`px-3 py-1 rounded text-sm transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          {anthropic === null ? (
+            <div className={`text-center py-6 text-sm ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+              Add <code className={`font-mono px-1 rounded ${darkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>VITE_ANTHROPIC_API_KEY</code> to{' '}
+              <code className={`font-mono px-1 rounded ${darkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>.env.local</code> to enable the copilot
+            </div>
+          ) : (
+            <>
+              {/* Message history */}
+              <div className={`h-[280px] overflow-y-auto rounded-lg p-3 mb-3 ${darkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
+                {chatMessages.length === 0 ? (
+                  <div className={`text-center text-sm mt-10 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                    Ask anything about music theory, chord voicings, or your current progression
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {chatMessages.map((msg, i) => (
+                      <div key={i} className={`text-sm ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                        <span className={`inline-block px-3 py-2 rounded-lg max-w-[85%] text-left whitespace-pre-wrap ${
+                          msg.role === 'user'
+                            ? darkMode ? 'bg-amber-900 text-amber-100' : 'bg-amber-100 text-amber-900'
+                            : darkMode ? 'bg-neutral-700 text-gray-200' : 'bg-white border border-gray-200 text-gray-800'
+                        }`}>
+                          {msg.content}
+                        </span>
+                      </div>
+                    ))}
+                    <div ref={chatEndRef} />
+                  </div>
+                )}
+              </div>
+              {/* Suggested prompt chips */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {['Explain this chord', 'What scale fits?', 'Why does this progression work?'].map((prompt) => (
+                  <button
+                    key={prompt}
+                    onClick={() => setChatInput(prompt)}
+                    className={`px-3 py-1 rounded-full text-xs transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200'}`}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+              {/* Input row */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(); } }}
+                  placeholder="Ask about music theory..."
+                  disabled={chatLoading}
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 ${darkMode ? 'bg-neutral-800 border border-neutral-700 text-white placeholder-gray-600' : 'bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400'}`}
+                />
+                <button
+                  onClick={() => { void sendMessage(); }}
+                  disabled={chatLoading || !chatInput.trim()}
+                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors flex items-center gap-1"
+                >
+                  {chatLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Send ▶'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
 
       </div>
 
