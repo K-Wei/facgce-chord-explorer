@@ -158,16 +158,24 @@ const CHORD_LIBRARY = {
   'Csus4': { frets: [5, 7, 0, 0, 5, 0], family: 'Sus', description: 'C sus4 — wants to resolve to C' },
 
   // === Muted-string voicings (tighter, focused) ===
-  'C (tight)': { frets: [-1, -1, 0, 0, 0, 7], family: 'C', description: 'C major — muted bass, bright top' },
-  'Cmaj7 (tight)': { frets: [-1, -1, 0, 0, 0, 0], family: 'C', description: 'C-E open strings only — intimate' },
+  // C(0,0)=C, G(3,0)=G, C(4,0)=C, E(5,0)=E → C major ✓
+  'C (tight)': { frets: [-1, -1, 0, 0, 0, 0], family: 'C', description: 'C major — upper strings only' },
+  // C(2,0)=C, B(3,4)=B, C(4,0)=C, E(5,0)=E → Cmaj7(no5) ✓
+  'Cmaj7 (tight)': { frets: [-1, -1, 0, 4, 0, 0], family: 'C', description: 'Cmaj7 — B on G string, no bass' },
+  // A(1,0)=A, C(2,0)=C, A(3,2)=A, C(4,0)=C, E(5,0)=E → Am ✓
   'Am (mid)': { frets: [-1, 0, 0, 2, 0, 0], family: 'Am', description: 'Am without low F — cleaner' },
-  'Am7 (mid)': { frets: [-1, 0, 0, 2, 3, 0], family: 'Am', description: 'Am7 without bass — airy' },
-  'Dm (tight)': { frets: [-1, -1, 2, 0, 3, 0], family: 'Dm', description: 'Dm upper strings — twinkling' },
-  'Em (tight)': { frets: [-1, -1, 0, 0, 0, 0], family: 'Em', description: 'G-C-E open — Em triad, no bass' },
-  'G (mid)': { frets: [-1, -1, 0, 0, 0, 0], family: 'G', description: 'G from upper open strings only' },
-  'G (top)': { frets: [-1, -1, -1, 0, 0, 0], family: 'G', description: 'G-C-E top three strings only' },
+  // A(1,0)=A, C(2,0)=C, G(3,0)=G, C(4,0)=C, E(5,0)=E → Am7 ✓
+  'Am7 (mid)': { frets: [-1, 0, 0, 0, 0, 0], family: 'Am', description: 'Am7 — open strings minus low F' },
+  // D(2,2)=D, A(3,2)=A, C(4,0)=C, F(5,1)=F → Dm7 ✓
+  'Dm7 (tight)': { frets: [-1, -1, 2, 2, 0, 1], family: 'Dm', description: 'Dm7 upper strings — compact' },
+  // A(3,2)=A, C(4,0)=C, E(5,0)=E → Am ✓
+  'Am (top)': { frets: [-1, -1, -1, 2, 0, 0], family: 'Am', description: 'Am — top three strings only' },
+  // G(3,0)=G, C(4,0)=C, E(5,0)=E → C/G ✓
+  'C/G': { frets: [-1, -1, -1, 0, 0, 0], family: 'C', description: 'C/G — second inversion, top three' },
+  // F(0,0)=F, C(2,0)=C → F5 ✓
   'F5': { frets: [0, -1, 0, -1, -1, -1], family: 'F', description: 'F power chord — F and C only' },
-  'Dm7 (mid)': { frets: [-1, -1, 2, 0, 0, 5], family: 'Dm', description: 'Dm7 top strings — delicate' },
+  // C(2,0)=C, G(3,0)=G, D(4,2)=D, E(5,0)=E → Cadd9 ✓
+  'Cadd9 (tight)': { frets: [-1, -1, 0, 0, 2, 0], family: 'C', description: 'Cadd9 — shimmering, no bass' },
 };
 
 // Common progressions in FACGCE (all in C major context)
@@ -221,8 +229,8 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Resolving, warm',
     chords: [
-      { nashville: 'ii', name: 'Dm7', frets: [-1, -1, 2, 0, 3, 0] },
-      { nashville: 'V', name: 'G6', frets: [-1, -1, 0, 0, 0, 0] },
+      { nashville: 'ii', name: 'Dm7', frets: [3, 5, 2, 0, 3, 0] },
+      { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
       { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
     ]
   },
@@ -231,9 +239,9 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Gentle descent',
     chords: [
-      { nashville: 'I', name: 'Cadd9', frets: [-1, -1, 0, 2, 0, 7] },
-      { nashville: 'iii', name: 'Em7', frets: [-1, 2, 0, 0, 3, 0] },
-      { nashville: 'vi', name: 'Am7', frets: [-1, 0, 0, 2, 3, 0] },
+      { nashville: 'I', name: 'Cadd9', frets: [7, 9, 0, 2, 0, 0] },
+      { nashville: 'iii', name: 'Em7', frets: [0, 2, 0, 0, 3, 0] },
+      { nashville: 'vi', name: 'Am7', frets: [0, 0, 0, 2, 3, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
     ]
   },
@@ -242,10 +250,10 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Restless, searching',
     chords: [
-      { nashville: 'vi', name: 'Am7', frets: [-1, 0, 0, 2, 3, 0] },
-      { nashville: 'V', name: 'Gsus4', frets: [-1, -1, 0, 0, 5, 0] },
+      { nashville: 'vi', name: 'Am7', frets: [0, 0, 0, 2, 3, 0] },
+      { nashville: 'V', name: 'Gsus4', frets: [2, 4, 0, 0, 5, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
-      { nashville: 'V', name: 'G6', frets: [-1, -1, 0, 0, 0, 0] },
+      { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
     ]
   },
   {
@@ -332,10 +340,10 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Descending melancholy',
     chords: [
-      { nashville: 'I', name: 'Cmaj9', frets: [-1, -1, 0, 2, 0, 0] },
-      { nashville: 'iii', name: 'Em9', frets: [-1, 2, 0, 0, 0, 2] },
-      { nashville: 'vi', name: 'Am9', frets: [-1, 0, 0, 2, 3, 0] },
-      { nashville: 'ii', name: 'Dm9', frets: [-1, -1, 2, 0, 3, 0] },
+      { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
+      { nashville: 'iii', name: 'Em9', frets: [0, 2, 0, 0, 0, 2] },
+      { nashville: 'vi', name: 'Am9', frets: [0, 0, 0, 2, 3, 0] },
+      { nashville: 'ii', name: 'Dm9', frets: [3, 5, 2, 0, 3, 0] },
     ]
   },
   {
@@ -365,10 +373,10 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Late night, reflective',
     chords: [
-      { nashville: 'vi', name: 'Am(add9)', frets: [-1, 0, 2, 2, 0, 0] },
-      { nashville: 'iii', name: 'Em7', frets: [-1, 2, 0, 0, 3, 0] },
+      { nashville: 'vi', name: 'Am(add9)', frets: [0, 0, 2, 2, 0, 0] },
+      { nashville: 'iii', name: 'Em7', frets: [0, 2, 0, 0, 3, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
-      { nashville: 'I', name: 'Cmaj9', frets: [-1, -1, 0, 2, 0, 0] },
+      { nashville: 'I', name: 'Cmaj9', frets: [5, 7, 0, 2, 0, 0] },
     ]
   },
   {
@@ -419,10 +427,10 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Descending, American Football',
     chords: [
-      { nashville: 'vi', name: 'Am9', frets: [-1, 0, 0, 2, 3, 0] },
-      { nashville: 'V', name: 'G6', frets: [-1, -1, 0, 0, 0, 0] },
+      { nashville: 'vi', name: 'Am9', frets: [0, 0, 0, 2, 3, 0] },
+      { nashville: 'V', name: 'G6', frets: [2, 4, 0, 0, 0, 0] },
       { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, 0, 0, 0] },
-      { nashville: 'iii', name: 'Em9', frets: [-1, 2, 0, 0, 0, 2] },
+      { nashville: 'iii', name: 'Em9', frets: [0, 2, 0, 0, 0, 2] },
     ]
   },
   {
@@ -442,21 +450,29 @@ const PROGRESSIONS = [
     key: 'C',
     mood: 'Quiet verse, intimate',
     chords: [
-      { nashville: 'I', name: 'Cmaj7', frets: [-1, -1, 0, 0, 0, 0] },
-      { nashville: 'vi', name: 'Am7', frets: [-1, 0, 0, 2, 3, 0] },
-      { nashville: 'ii', name: 'Dm7', frets: [-1, -1, 2, 0, 0, 5] },
-      { nashville: 'V', name: 'G', frets: [-1, -1, -1, 0, 0, 0] },
+      // C(0), G(0), C(0), E(0) → C major
+      { nashville: 'I', name: 'C', frets: [-1, -1, 0, 0, 0, 0] },
+      // A(0), C(0), G(0), C(0), E(0) → Am7
+      { nashville: 'vi', name: 'Am7', frets: [-1, 0, 0, 0, 0, 0] },
+      // D(2), A(2), C(0), F(1) → Dm7
+      { nashville: 'ii', name: 'Dm7', frets: [-1, -1, 2, 2, 0, 1] },
+      // G(0), C(0), E(0) → C/G
+      { nashville: 'V', name: 'C/G', frets: [-1, -1, -1, 0, 0, 0] },
     ]
   },
   {
-    name: 'IV - vi - iii - I (sparse)',
+    name: 'IV - vi - I - vi (sparse)',
     key: 'C',
     mood: 'Sparse, breathing room',
     chords: [
-      { nashville: 'IV', name: 'F', frets: [0, -1, 0, -1, 0, 0] },
+      // F(0), A(0), C(0), C(0), E(0) → F with open strings
+      { nashville: 'IV', name: 'Fmaj9', frets: [0, 0, 0, -1, 0, 0] },
+      // A(0), C(0), A(2), E(0) → Am
       { nashville: 'vi', name: 'Am', frets: [-1, 0, 0, 2, -1, 0] },
-      { nashville: 'iii', name: 'Em', frets: [-1, -1, 0, 0, 0, 0] },
-      { nashville: 'I', name: 'C', frets: [-1, -1, 0, 0, 0, 7] },
+      // C(0), G(0), D(2), E(0) → Cadd9
+      { nashville: 'I', name: 'Cadd9', frets: [-1, -1, 0, 0, 2, 0] },
+      // A(0), C(0), A(2), C(0), E(0) → Am
+      { nashville: 'vi', name: 'Am (mid)', frets: [-1, 0, 0, 2, 0, 0] },
     ]
   },
 ];
@@ -768,7 +784,7 @@ function getExtensionSuggestions(selectedFrets: number[], chordName: string) {
         if (newFret >= 0 && newFret <= 24) candidates.push(newFret);
       }
       // Also try muting (lifting finger)
-      if (currentFret > 0) candidates.push(0, -1);
+      if (currentFret > 0) candidates.push(0);
     }
 
     for (const newFret of candidates) {
