@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Music, RefreshCw, Lightbulb, Sun, Moon, HelpCircle, X } from 'lucide-react';
+import { Music, RefreshCw, Lightbulb, Sun, Moon, HelpCircle, X, MessageCircle } from 'lucide-react';
 import Anthropic from '@anthropic-ai/sdk';
 
 function TuningForkIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -833,6 +833,7 @@ export default function ChordExplorer() {
   const [darkMode, setDarkMode] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
   const [showTuner, setShowTuner] = useState(false);
+  const [showCopilot, setShowCopilot] = useState(false);
   const [chatMessages, setChatMessages] = useState<{role:'user'|'assistant', content:string}[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
@@ -1031,6 +1032,13 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
         <div className="text-center mb-8 relative">
           <div className="absolute right-0 top-0 flex gap-2">
             <button
+              onClick={() => setShowCopilot(!showCopilot)}
+              className={`p-2 rounded-full transition-colors ${showCopilot ? (darkMode ? 'bg-emerald-800 text-emerald-200' : 'bg-emerald-100 text-emerald-700') : (darkMode ? 'bg-neutral-800 hover:bg-neutral-700 text-gray-300' : 'bg-white hover:bg-gray-200 text-gray-600 shadow')}`}
+              title="Music Theory Copilot"
+            >
+              <MessageCircle className="w-5 h-5" />
+            </button>
+            <button
               onClick={() => setShowTuner(!showTuner)}
               className={`p-2 rounded-full transition-colors ${showTuner ? (darkMode ? 'bg-amber-800 text-amber-200' : 'bg-amber-100 text-amber-700') : (darkMode ? 'bg-neutral-800 hover:bg-neutral-700 text-gray-300' : 'bg-white hover:bg-gray-200 text-gray-600 shadow')}`}
             >
@@ -1075,7 +1083,8 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="flex gap-6 items-start">
+          <div className="flex-1 grid md:grid-cols-2 gap-6 min-w-0">
           {/* Chord Input Section */}
           <div className={`rounded-xl p-6 ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-lg'}`}>
             <div className="flex justify-between items-center mb-4">
@@ -1250,83 +1259,94 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
               </div>
             )}
           </div>
-        </div>
-
-        {/* Music Theory Copilot */}
-        <div className={`mt-6 rounded-xl p-6 ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-lg'}`}>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Music Theory Copilot</h2>
-            {chatMessages.length > 0 && (
-              <button
-                onClick={() => setChatMessages([])}
-                className={`px-3 py-1 rounded text-sm transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
-              >
-                Clear
-              </button>
-            )}
           </div>
-          {anthropic === null ? (
-            <div className={`text-center py-6 text-sm ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-              Add <code className={`font-mono px-1 rounded ${darkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>VITE_ANTHROPIC_API_KEY</code> to{' '}
-              <code className={`font-mono px-1 rounded ${darkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>.env.local</code> to enable the copilot
-            </div>
-          ) : (
-            <>
-              {/* Message history */}
-              <div className={`h-[280px] overflow-y-auto rounded-lg p-3 mb-3 ${darkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
-                {chatMessages.length === 0 ? (
-                  <div className={`text-center text-sm mt-10 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
-                    Ask anything about music theory, chord voicings, or your current progression
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {chatMessages.map((msg, i) => (
-                      <div key={i} className={`text-sm ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                        <span className={`inline-block px-3 py-2 rounded-lg max-w-[85%] text-left whitespace-pre-wrap ${
-                          msg.role === 'user'
-                            ? darkMode ? 'bg-amber-900 text-amber-100' : 'bg-amber-100 text-amber-900'
-                            : darkMode ? 'bg-neutral-700 text-gray-200' : 'bg-white border border-gray-200 text-gray-800'
-                        }`}>
-                          {msg.content}
-                        </span>
-                      </div>
-                    ))}
-                    <div ref={chatEndRef} />
-                  </div>
-                )}
-              </div>
-              {/* Suggested prompt chips */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {['Explain this chord', 'What scale fits?', 'Why does this progression work?'].map((prompt) => (
+
+          {/* Music Theory Copilot Sidebar */}
+          {showCopilot && (
+            <div className={`w-80 flex-shrink-0 flex flex-col rounded-xl sticky top-6 self-start ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-lg'}`}>
+              <div className={`flex justify-between items-center px-4 py-3 border-b ${darkMode ? 'border-neutral-800' : 'border-gray-100'}`}>
+                <span className="font-semibold text-sm">Music Theory Copilot</span>
+                <div className="flex items-center gap-2">
+                  {chatMessages.length > 0 && (
+                    <button
+                      onClick={() => setChatMessages([])}
+                      className={`px-2 py-1 rounded text-xs transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
+                    >
+                      Clear
+                    </button>
+                  )}
                   <button
-                    key={prompt}
-                    onClick={() => setChatInput(prompt)}
-                    className={`px-3 py-1 rounded-full text-xs transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200'}`}
+                    onClick={() => setShowCopilot(false)}
+                    className={`p-1 rounded transition-colors ${darkMode ? 'hover:bg-neutral-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
                   >
-                    {prompt}
+                    <X className="w-4 h-4" />
                   </button>
-                ))}
+                </div>
               </div>
-              {/* Input row */}
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(); } }}
-                  placeholder="Ask about music theory..."
-                  disabled={chatLoading}
-                  className={`flex-1 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 ${darkMode ? 'bg-neutral-800 border border-neutral-700 text-white placeholder-gray-600' : 'bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400'}`}
-                />
-                <button
-                  onClick={() => { void sendMessage(); }}
-                  disabled={chatLoading || !chatInput.trim()}
-                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors flex items-center gap-1"
-                >
-                  {chatLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Send ▶'}
-                </button>
-              </div>
-            </>
+              {anthropic === null ? (
+                <div className={`text-center p-4 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  Add <code className={`font-mono px-1 rounded ${darkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>VITE_ANTHROPIC_API_KEY</code> to{' '}
+                  <code className={`font-mono px-1 rounded ${darkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>.env.local</code>
+                </div>
+              ) : (
+                <>
+                  {/* Message history */}
+                  <div className={`overflow-y-auto p-3 h-[420px] ${darkMode ? 'bg-neutral-800/50' : 'bg-gray-50'}`}>
+                    {chatMessages.length === 0 ? (
+                      <div className={`text-center text-xs mt-8 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                        Ask anything about music theory, chord voicings, or your current progression
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {chatMessages.map((msg, i) => (
+                          <div key={i} className={`text-xs ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                            <span className={`inline-block px-2.5 py-1.5 rounded-lg max-w-[90%] text-left whitespace-pre-wrap ${
+                              msg.role === 'user'
+                                ? darkMode ? 'bg-amber-900 text-amber-100' : 'bg-amber-100 text-amber-900'
+                                : darkMode ? 'bg-neutral-700 text-gray-200' : 'bg-white border border-gray-200 text-gray-800'
+                            }`}>
+                              {msg.content}
+                            </span>
+                          </div>
+                        ))}
+                        <div ref={chatEndRef} />
+                      </div>
+                    )}
+                  </div>
+                  {/* Suggested prompt chips */}
+                  <div className="flex flex-wrap gap-1.5 px-3 pt-3">
+                    {['Explain this chord', 'What scale fits?', 'Why does this progression work?'].map((prompt) => (
+                      <button
+                        key={prompt}
+                        onClick={() => setChatInput(prompt)}
+                        className={`px-2.5 py-1 rounded-full text-xs transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200'}`}
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Input row */}
+                  <div className="flex gap-2 p-3">
+                    <input
+                      type="text"
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(); } }}
+                      placeholder="Ask about music theory..."
+                      disabled={chatLoading}
+                      className={`flex-1 px-3 py-2 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 ${darkMode ? 'bg-neutral-800 border border-neutral-700 text-white placeholder-gray-600' : 'bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400'}`}
+                    />
+                    <button
+                      onClick={() => { void sendMessage(); }}
+                      disabled={chatLoading || !chatInput.trim()}
+                      className="px-3 py-2 bg-emerald-700 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs transition-colors flex items-center"
+                    >
+                      {chatLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : '▶'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
 
