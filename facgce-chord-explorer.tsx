@@ -1,5 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Music, RefreshCw, Lightbulb, Sun, Moon, Volume2 } from 'lucide-react';
+import { Music, RefreshCw, Lightbulb, Sun, Moon, HelpCircle, X } from 'lucide-react';
+
+function TuningForkIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* Fork prongs */}
+      <path d="M10 3v7a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V3" />
+      {/* Handle */}
+      <line x1="12" y1="12" x2="12" y2="21" />
+      {/* Ball at bottom */}
+      <circle cx="12" cy="21" r="1" fill="currentColor" />
+      {/* Vibration waves left */}
+      <path d="M6 4.5a4 4 0 0 0 0 5" />
+      <path d="M3.5 3a7 7 0 0 0 0 8" />
+      {/* Vibration waves right */}
+      <path d="M18 4.5a4 4 0 0 1 0 5" />
+      <path d="M20.5 3a7 7 0 0 1 0 8" />
+    </svg>
+  );
+}
 
 const TUNING = ['F', 'A', 'C', 'G', 'C', 'E'];
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -833,6 +852,8 @@ export default function ChordExplorer() {
   const [selectedFrets, setSelectedFrets] = useState(Array(6).fill(-1));
   const [currentProgression, setCurrentProgression] = useState<any>(null);
   const [darkMode, setDarkMode] = useState(true);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showTuner, setShowTuner] = useState(false);
 
   const handleFretChange = (stringIndex, value) => {
     const newFrets = [...selectedFrets];
@@ -970,54 +991,85 @@ export default function ChordExplorer() {
   const extensionSuggestions = notes.length > 0 ? getExtensionSuggestions(selectedFrets, chordName) : [];
 
   return (
-    <div className={`min-h-screen p-6 ${darkMode ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white' : 'bg-gradient-to-br from-gray-100 via-purple-100 to-gray-100 text-gray-900'}`}>
+    <div className={`min-h-screen p-6 ${darkMode ? 'bg-neutral-950 text-white' : 'bg-stone-50 text-gray-900'}`}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8 relative">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className={`absolute right-0 top-0 p-2 rounded-full transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-white hover:bg-gray-200 text-gray-900 shadow'}`}
-          >
-            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <Music className={`w-8 h-8 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
-            <h1 className="text-4xl font-bold">FACGCE Chord Explorer</h1>
+          <div className="absolute right-0 top-0 flex gap-2">
+            <button
+              onClick={() => setShowTuner(!showTuner)}
+              className={`p-2 rounded-full transition-colors ${showTuner ? (darkMode ? 'bg-amber-800 text-amber-200' : 'bg-amber-100 text-amber-700') : (darkMode ? 'bg-neutral-800 hover:bg-neutral-700 text-gray-300' : 'bg-white hover:bg-gray-200 text-gray-600 shadow')}`}
+            >
+              <TuningForkIcon className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowHelp(true)}
+              className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-neutral-800 hover:bg-neutral-700 text-gray-300' : 'bg-white hover:bg-gray-200 text-gray-600 shadow'}`}
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-neutral-800 hover:bg-neutral-700 text-white' : 'bg-white hover:bg-gray-200 text-gray-900 shadow'}`}
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
           </div>
-          <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Discover chord voicings and progressions in open FACGCE tuning</p>
-          <p className={`text-sm mt-1 ${darkMode ? 'text-purple-300' : 'text-purple-600'}`}>Open strings: F major 9 (F-A-C-G-C-E)</p>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <Music className={`w-8 h-8 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
+            <h1 className="text-4xl font-bold tracking-tight">FACGCE Chord Explorer</h1>
+          </div>
+          <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Voicings and progressions for open FACGCE tuning</p>
         </div>
+
+        {/* Tuner Panel */}
+        {showTuner && (
+          <div className={`mb-6 rounded-xl p-4 flex items-center justify-center gap-3 ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-lg'}`}>
+            {TUNING.map((note, idx) => (
+              <button
+                key={idx}
+                onClick={() => playNote(STRING_FREQUENCIES[idx])}
+                className={`w-12 h-12 flex items-center justify-center rounded-lg text-lg font-bold transition-colors ${
+                  darkMode
+                    ? 'bg-neutral-800 hover:bg-neutral-700 active:bg-neutral-600'
+                    : 'bg-gray-50 hover:bg-gray-100 active:bg-gray-200 border border-gray-200'
+                }`}
+              >
+                {note}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* Chord Input Section */}
-          <div className={`rounded-lg p-6 shadow-xl ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-lg'}`}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Enter Chord Shape</h2>
               <button
                 onClick={clearInput}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors text-sm"
+                className={`px-4 py-2 rounded-lg transition-colors text-sm ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
               >
                 Clear
               </button>
             </div>
 
             {/* Interactive fret inputs */}
-            <div className={`mb-4 p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-              <div className={`text-sm mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Enter fret numbers (0 for open, x for muted):</div>
+            <div className={`mb-4 p-4 rounded-lg ${darkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
               <div className="grid grid-cols-6 gap-2">
                 {selectedFrets.map((fret, idx) => (
                   <div key={idx} className="text-center">
-                    <div className={`text-xs mb-1 font-semibold ${darkMode ? 'text-purple-300' : 'text-purple-600'}`}>{TUNING[idx]}</div>
+                    <div className={`text-xs mb-1 font-semibold ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>{TUNING[idx]}</div>
                     <input
                       type="text"
                       value={fret < 0 ? '' : fret}
                       onChange={(e) => handleFretChange(idx, e.target.value)}
                       placeholder="x"
-                      className={`w-full h-14 text-center text-xl font-mono rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      className={`w-full h-14 text-center text-xl font-mono rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-amber-500 ${
                         fret === 0
-                          ? darkMode ? 'bg-green-900 border-green-500 text-white' : 'bg-green-100 border-green-500 text-green-900'
+                          ? darkMode ? 'bg-emerald-950 border-emerald-600 text-emerald-200' : 'bg-green-50 border-green-500 text-green-900'
                           : fret > 0
-                          ? darkMode ? 'bg-gray-800 border-purple-500 text-white' : 'bg-white border-purple-500 text-gray-900'
-                          : darkMode ? 'bg-gray-900 border-gray-600 text-gray-500' : 'bg-gray-50 border-gray-300 text-gray-400'
+                          ? darkMode ? 'bg-neutral-900 border-amber-600 text-white' : 'bg-white border-amber-500 text-gray-900'
+                          : darkMode ? 'bg-neutral-950 border-neutral-700 text-gray-500' : 'bg-gray-50 border-gray-300 text-gray-400'
                       }`}
                       maxLength={2}
                       autoComplete="off"
@@ -1026,25 +1078,22 @@ export default function ChordExplorer() {
                   </div>
                 ))}
               </div>
-              <div className={`mt-3 text-xs text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                Tuning (low to high): F - A - C - G - C - E
-              </div>
             </div>
 
             {/* Chord Analysis */}
-            <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+            <div className={`p-4 rounded-lg ${darkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
               <h3 className="font-semibold mb-3">Chord Analysis</h3>
-              <div className={`text-2xl font-bold mb-3 ${darkMode ? 'text-purple-300' : 'text-purple-600'}`}>{chordName}</div>
-              
+              <div className={`text-2xl font-bold mb-3 ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>{chordName}</div>
+
               {notes.length > 0 && (
                 <div className="space-y-2">
-                  <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Notes:</div>
+                  <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Notes:</div>
                   <div className="flex flex-wrap gap-2">
                     {notes.map((n, i) => (
                       <span key={i} className={`px-3 py-1 rounded-full text-sm ${
                         n.fret === 0
-                          ? darkMode ? 'bg-green-600 text-white' : 'bg-green-200 text-green-900'
-                          : darkMode ? 'bg-purple-600 text-white' : 'bg-purple-200 text-purple-900'
+                          ? darkMode ? 'bg-emerald-900 text-emerald-200' : 'bg-green-100 text-green-800'
+                          : darkMode ? 'bg-neutral-700 text-gray-200' : 'bg-gray-200 text-gray-800'
                       }`}>
                         {n.note} {n.fret === 0 ? '(open)' : `(fret ${n.fret})`}
                       </span>
@@ -1056,7 +1105,7 @@ export default function ChordExplorer() {
 
             {/* Extension Suggestions */}
             {extensionSuggestions.length > 0 && (
-              <div className={`mt-4 p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              <div className={`mt-4 p-4 rounded-lg ${darkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   <Lightbulb className="w-4 h-4 text-yellow-400" />
                   Try adding...
@@ -1067,11 +1116,11 @@ export default function ChordExplorer() {
                       key={i}
                       onClick={() => loadChordShape(suggestion.frets)}
                       className={`w-full text-left p-3 rounded-lg transition-colors text-sm ${
-                        darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-white hover:bg-gray-50'
+                        darkMode ? 'bg-neutral-700 hover:bg-neutral-600' : 'bg-white hover:bg-gray-100 border border-gray-200'
                       }`}
                     >
-                      <span className={darkMode ? 'text-gray-200' : 'text-gray-700'}>{suggestion.description}</span>
-                      <span className={`ml-2 font-semibold ${darkMode ? 'text-purple-300' : 'text-purple-600'}`}>{suggestion.resultName}</span>
+                      <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{suggestion.description}</span>
+                      <span className={`ml-2 font-semibold ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>{suggestion.resultName}</span>
                     </button>
                   ))}
                 </div>
@@ -1080,7 +1129,7 @@ export default function ChordExplorer() {
           </div>
 
           {/* Progression Generator Section */}
-          <div className={`rounded-lg p-6 shadow-xl ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-lg'}`}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 <Lightbulb className="w-5 h-5 text-yellow-400" />
@@ -1088,7 +1137,7 @@ export default function ChordExplorer() {
               </h2>
               <button
                 onClick={generateProgression}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center gap-2 text-sm"
+                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
               >
                 <RefreshCw className="w-4 h-4" />
                 Generate
@@ -1097,12 +1146,11 @@ export default function ChordExplorer() {
 
             {currentProgression ? (
               <div className="space-y-4">
-                <div className={`p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                  <div className={`text-sm mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Progression:</div>
+                <div className={`p-3 rounded-lg ${darkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
                   <div className="font-semibold text-lg">{currentProgression.name}</div>
                   <div className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Key of {currentProgression.key}</div>
                   {currentProgression.mood && (
-                    <div className={`text-xs mt-1 italic ${darkMode ? 'text-purple-300' : 'text-purple-500'}`}>{currentProgression.mood}</div>
+                    <div className={`text-xs mt-1 italic ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>{currentProgression.mood}</div>
                   )}
                 </div>
 
@@ -1110,24 +1158,24 @@ export default function ChordExplorer() {
                   {currentProgression.chords.map((chord, idx) => (
                     <div key={idx} className={`p-4 rounded-lg transition-colors ${
                       chord.isUserChord
-                        ? darkMode ? 'bg-purple-900 border-2 border-purple-500' : 'bg-purple-100 border-2 border-purple-400'
-                        : darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
+                        ? darkMode ? 'bg-amber-950 border border-amber-700' : 'bg-amber-50 border-2 border-amber-400'
+                        : darkMode ? 'bg-neutral-800 hover:bg-neutral-750' : 'bg-gray-50 hover:bg-gray-100'
                     }`}>
                       <div className="flex justify-between items-center mb-3">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className={`text-sm font-mono px-2 py-1 rounded ${darkMode ? 'bg-purple-900 text-white' : 'bg-purple-200 text-purple-900'}`}>
+                            <span className={`text-sm font-mono px-2 py-1 rounded ${darkMode ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
                               {chord.nashville}
                             </span>
-                            <span className={`text-xl font-bold ${darkMode ? 'text-purple-300' : 'text-purple-600'}`}>{chord.name}</span>
+                            <span className={`text-xl font-bold ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>{chord.name}</span>
                             {chord.isUserChord && (
-                              <span className="text-xs bg-green-600 px-2 py-1 rounded">Your Chord</span>
+                              <span className={`text-xs px-2 py-1 rounded ${darkMode ? 'bg-amber-800 text-amber-200' : 'bg-amber-200 text-amber-800'}`}>Your Chord</span>
                             )}
                           </div>
                         </div>
                         <button
                           onClick={() => loadChordShape(chord.frets)}
-                          className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+                          className={`px-3 py-1 rounded text-sm transition-colors ${darkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
                         >
                           Load
                         </button>
@@ -1137,22 +1185,24 @@ export default function ChordExplorer() {
                           <div
                             key={string}
                             className={`w-8 h-8 flex items-center justify-center rounded text-xs font-mono ${
-                              fret === 0
-                                ? darkMode ? 'bg-green-700 text-white' : 'bg-green-200 text-green-900'
-                                : darkMode ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-900'
+                              fret < 0
+                                ? darkMode ? 'bg-neutral-900 text-gray-500' : 'bg-gray-100 text-gray-400'
+                                : fret === 0
+                                ? darkMode ? 'bg-emerald-900 text-emerald-200' : 'bg-green-100 text-green-800'
+                                : darkMode ? 'bg-neutral-700 text-white' : 'bg-gray-200 text-gray-900'
                             }`}
                           >
                             {fret < 0 ? 'X' : fret}
                           </div>
                         ))}
                       </div>
-                      <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <div className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                         {chord.frets.map((fret, string) =>
                           fret >= 0 ? getNoteFromString(string, fret) : null
                         ).filter(n => n).join(' - ')}
                       </div>
                       {chord.voiceLeadingHints && chord.voiceLeadingHints.length > 0 && (
-                        <div className={`text-xs mt-1 italic ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                        <div className={`text-xs mt-1 italic ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
                           {chord.voiceLeadingHints.join(', ')}
                         </div>
                       )}
@@ -1161,47 +1211,57 @@ export default function ChordExplorer() {
                 </div>
               </div>
             ) : (
-              <div className={`text-center py-12 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>Click "Generate" to get chord progression ideas</p>
-                <p className="text-sm mt-2">Progressions use Nashville Number System</p>
+              <div className={`text-center py-12 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>Enter a chord shape and hit Generate</p>
+                <p className="text-sm mt-1">or just hit Generate for a random progression</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Tuner Section */}
-        <div className={`mt-6 rounded-lg p-6 shadow-xl ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-          <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
-            <Volume2 className={`w-5 h-5 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
-            String Tuner
-          </h2>
-          <div className="grid grid-cols-6 gap-3">
-            {TUNING.map((note, idx) => (
-              <button
-                key={idx}
-                onClick={() => playNote(STRING_FREQUENCIES[idx])}
-                className={`flex flex-col items-center gap-1 p-4 rounded-lg transition-colors ${
-                  darkMode
-                    ? 'bg-gray-700 hover:bg-purple-700 active:bg-purple-600'
-                    : 'bg-gray-100 hover:bg-purple-200 active:bg-purple-300'
-                }`}
-              >
-                <span className="text-2xl font-bold">{note}</span>
-                <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  String {idx + 1}
-                </span>
-                <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                  {STRING_FREQUENCIES[idx].toFixed(1)} Hz
-                </span>
-              </button>
-            ))}
-          </div>
-          <p className={`text-xs text-center mt-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-            Click a string to hear its open tuning note
-          </p>
-        </div>
+
       </div>
+
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowHelp(false)}>
+          <div
+            className={`max-w-lg w-full rounded-xl p-6 relative max-h-[80vh] overflow-y-auto ${darkMode ? 'bg-neutral-900 border border-neutral-700 text-gray-200' : 'bg-white text-gray-800 shadow-2xl'}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowHelp(false)}
+              className={`absolute top-4 right-4 p-1 rounded-full transition-colors ${darkMode ? 'hover:bg-neutral-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-xl font-bold mb-4">How to use</h2>
+            <div className="space-y-4 text-sm leading-relaxed">
+              <div>
+                <h3 className={`font-semibold mb-1 ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>Chord Input</h3>
+                <p>Enter fret numbers for each string (low to high). Type <kbd className={`px-1.5 py-0.5 rounded text-xs font-mono ${darkMode ? 'bg-neutral-700' : 'bg-gray-100'}`}>0</kbd> for open strings, <kbd className={`px-1.5 py-0.5 rounded text-xs font-mono ${darkMode ? 'bg-neutral-700' : 'bg-gray-100'}`}>x</kbd> to mute. The app identifies the chord and shows its notes.</p>
+              </div>
+              <div>
+                <h3 className={`font-semibold mb-1 ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>Progressions</h3>
+                <p>Hit <strong>Generate</strong> to get progression suggestions. If you've entered a chord, the progression starts from your shape and ranks options by voice-leading smoothness. Nashville numbers (I, ii, IV, etc.) show the function of each chord.</p>
+              </div>
+              <div>
+                <h3 className={`font-semibold mb-1 ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>Try Adding...</h3>
+                <p>After entering a chord, the app suggests reachable extensions (add9, sus2, maj7, etc.) that are 1-2 finger movements away. Click any suggestion to load it.</p>
+              </div>
+              <div>
+                <h3 className={`font-semibold mb-1 ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>Chord Library</h3>
+                <p>Quick access to preset voicings that work well in FACGCE. Click any chord name to load its shape into the input.</p>
+              </div>
+              <div>
+                <h3 className={`font-semibold mb-1 ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>Tuner</h3>
+                <p>Click any note to hear the open string pitch. Tune low to high: F - A - C - G - C - E.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
