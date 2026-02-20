@@ -1030,7 +1030,7 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
   const extensionSuggestions = notes.length > 0 ? getExtensionSuggestions(selectedFrets, chordName) : [];
 
   return (
-    <div className={`min-h-screen p-6 ${darkMode ? 'bg-neutral-950 text-white' : 'bg-stone-50 text-gray-900'}`}>
+    <div className={`min-h-dvh p-6 ${darkMode ? 'bg-neutral-950 text-white' : 'bg-stone-50 text-gray-900'}`}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex justify-center gap-2 mb-4">
@@ -1061,7 +1061,7 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
             </button>
           </div>
           <div className="flex items-center justify-center gap-3 mb-2">
-            <Music className={`w-8 h-8 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
+            <Music className={`w-8 h-8 hidden md:block ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
             <h1 className="text-4xl font-bold tracking-tight">FACGCE Chord Explorer</h1>
           </div>
           <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Voicings and progressions for open FACGCE tuning</p>
