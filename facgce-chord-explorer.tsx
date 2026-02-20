@@ -1029,8 +1029,12 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
   const notes = getNotes();
   const extensionSuggestions = notes.length > 0 ? getExtensionSuggestions(selectedFrets, chordName) : [];
 
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = darkMode ? '#0a0a0a' : '#fafaf5';
+  }, [darkMode]);
+
   return (
-    <div className={`min-h-dvh p-6 ${darkMode ? 'bg-neutral-950 text-white' : 'bg-stone-50 text-gray-900'}`}>
+    <div className={`p-4 md:p-6 ${darkMode ? 'bg-neutral-950 text-white' : 'bg-stone-50 text-gray-900'}`}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex justify-center gap-2 mb-4">
