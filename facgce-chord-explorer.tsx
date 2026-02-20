@@ -26,6 +26,12 @@ const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 // F2, A2, C3, G3, C4, E4
 const STRING_FREQUENCIES = [87.31, 110.00, 130.81, 196.00, 261.63, 329.63];
 
+let audioCtx: AudioContext | null = null;
+function getAudioContext(): AudioContext {
+  if (!audioCtx) audioCtx = new AudioContext();
+  return audioCtx;
+}
+
 function playNote(frequency: number) {
   const sampleRate = 44100;
   const duration = 3;
@@ -67,7 +73,8 @@ function playNote(frequency: number) {
   }
 
   // Play the rendered buffer through Web Audio with body resonance
-  const ctx = new AudioContext();
+  const ctx = getAudioContext();
+  if (ctx.state === 'suspended') ctx.resume();
   const buffer = ctx.createBuffer(1, totalSamples, sampleRate);
   buffer.getChannelData(0).set(output);
 
@@ -110,7 +117,6 @@ function playNote(frequency: number) {
   master.connect(ctx.destination);
 
   source.start();
-  setTimeout(() => ctx.close(), duration * 1000 + 100);
 }
 
 // Actual chord shapes that work well in FACGCE tuning
@@ -1026,8 +1032,8 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
   return (
     <div className={`min-h-screen p-6 ${darkMode ? 'bg-neutral-950 text-white' : 'bg-stone-50 text-gray-900'}`}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8 relative">
-          <div className="absolute right-0 top-0 flex gap-2">
+        <div className="text-center mb-8">
+          <div className="flex justify-center gap-2 mb-4">
             <button
               onClick={() => setShowCopilot(!showCopilot)}
               className={`p-2 rounded-full transition-colors ${showCopilot ? (darkMode ? 'bg-emerald-800 text-emerald-200' : 'bg-emerald-100 text-emerald-700') : (darkMode ? 'bg-neutral-800 hover:bg-neutral-700 text-gray-300' : 'bg-white hover:bg-gray-200 text-gray-600 shadow')}`}
@@ -1260,7 +1266,10 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
 
           {/* Music Theory Copilot Sidebar */}
           {showCopilot && (
-            <div className={`w-80 flex-shrink-0 flex flex-col rounded-xl sticky top-6 self-start ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-lg'}`}>
+            <>
+            {/* Mobile backdrop */}
+            <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setShowCopilot(false)} />
+            <div className={`fixed inset-0 z-50 flex flex-col md:static md:inset-auto md:z-auto md:w-80 md:flex-shrink-0 md:rounded-xl md:sticky md:top-6 md:self-start ${darkMode ? 'bg-neutral-900 md:border md:border-neutral-800' : 'bg-white md:shadow-lg'}`}>
               <div className={`flex justify-between items-center px-4 py-3 border-b ${darkMode ? 'border-neutral-800' : 'border-gray-100'}`}>
                 <span className="font-semibold text-sm">Music Theory Copilot</span>
                 <div className="flex items-center gap-2">
@@ -1281,7 +1290,7 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
                 </div>
               </div>
               {/* Message history */}
-              <div className={`overflow-y-auto p-3 h-[420px] ${darkMode ? 'bg-neutral-800/50' : 'bg-gray-50'}`}>
+              <div className={`overflow-y-auto p-3 flex-1 md:h-[420px] md:flex-none ${darkMode ? 'bg-neutral-800/50' : 'bg-gray-50'}`}>
                 {chatMessages.length === 0 ? (
                   <div className={`text-center text-xs mt-8 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
                     Ask anything about music theory, chord voicings, or your current progression
@@ -1335,6 +1344,7 @@ Keep answers concise (2–5 sentences). Focus on practical music theory.`;
                 </button>
               </div>
             </div>
+            </>
           )}
         </div>
 
